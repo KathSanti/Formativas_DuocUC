@@ -7,7 +7,7 @@ public class SeatingMap {
     static int[] preciosUnitarios = {20000, 18000, 16000, 14000, 11000};
     static String[] RowEntryType = {"VIP", "Platea Alta", "Platea Baja", "Palcos", "Balcon"};
 
-    public void MostrarMapaAsientos() {
+    public static void MostrarMapaAsientos() {
 
 
         System.out.println("\n==========  RESERVA DE ASIENTOS  ==========");

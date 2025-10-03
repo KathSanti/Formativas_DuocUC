@@ -8,26 +8,34 @@ public class Ticket {
 
     static ArrayList<Ticketdata> Tickets = new ArrayList<>();
 
-    static class Ticketdata {
+    static class Ticketdata  {
         String asiento;
         String zona;
         int precioOriginal;
         double descuento;
         double totalPagar;
+        int rutCliente;
+        String nombreCliente;
         int edadCliente;
+        int idticket;
+        int idEvent;
 
-        public Ticketdata(String asiento, String zona, int precioOriginal, double descuento, double totalPagar, int edadCliente) {
+        public Ticketdata(String asiento, String zona, int precioOriginal, double descuento, double totalPagar, int edadCliente, int rutCliente, String nombreCliente, int idticket, int idEvent) {
             this.asiento = asiento;
             this.zona = zona;
             this.precioOriginal = precioOriginal;
             this.descuento = descuento;
             this.totalPagar = totalPagar;
+            this.rutCliente = rutCliente;
+            this.nombreCliente = nombreCliente;
             this.edadCliente = edadCliente;
+            this.idticket = idticket;
+            this.idEvent = idEvent;
         }
 
     }
 
-    private Ticketdata Descuento (Scanner sc, int precioAsiento, String codigoAsiento, String zonaAsiento){
+    public Ticketdata Descuento (Scanner sc, int precioAsiento, String codigoAsiento, String zonaAsiento){
 
         int edad = 0;
         boolean edadValida = false;
@@ -89,7 +97,7 @@ public class Ticket {
         System.out.println("=====================================" );
         System.out.println(" " );
 
-        return new Ticketdata (codigoAsiento, zonaAsiento, precioAsiento, descuento, totalapagar, edad);
+        return new Ticketdata(codigoAsiento, zonaAsiento, precioAsiento, descuento, totalapagar, edad, 0, "Temporal", 0, 0 );
 
     }
 
@@ -134,7 +142,10 @@ public class Ticket {
         for (int i = 0; i < Tickets.size(); i++) {
             Ticket.Ticketdata ticketdata = Tickets.get(i);
             System.out.println("\n--- Boleta #" + (i + 1) + " ---");
+            System.out.println("N° de compra   : " + ticketdata.idticket);
             System.out.println("Asiento        : " + ticketdata.asiento);
+            System.out.println("Rut            : " + ticketdata.rutCliente);
+            System.out.println("Nombre         : " + ticketdata.nombreCliente);
             System.out.println("Zona           : " + ticketdata.zona);
             System.out.println("Edad cliente   : " +ticketdata.edadCliente);
             System.out.println("Precio original: $" + ticketdata.precioOriginal);
@@ -151,16 +162,5 @@ public class Ticket {
         System.out.println("\n=======================================");
 
     }
-
-
-
-
-
-
-
-
-
-
-
 
 }//THE END CLASS TICKET

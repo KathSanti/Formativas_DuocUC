@@ -1,13 +1,39 @@
 package Formativas_DuocUC.Semana8;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class TicketSale {
 
-    public void VentaEntradas(Scanner sc) {
+    public static class VentaPorEvento {
+        public String evento;
+        public String fecha;
+        public List<Ticket.Ticketdata> tickets;
+        public double total;
 
-        int interactiveButton = 1;
+        public VentaPorEvento(String evento, String fecha) {
+            this.evento = evento;
+            this.fecha = fecha;
+            this.tickets = new ArrayList<>();
+            this.total = 0;
+        }
+
+        public void agregarTicket(Ticket.Ticketdata ticket) {
+            this.tickets.add(ticket);
+            this.total += ticket.totalPagar;
+        }
+
+        public int getCantidadAsientos() {
+            return tickets.size();
+        }
+    }
+
+    public static List<VentaPorEvento> ventasPorEvento = new ArrayList<>();
+
+    public static void VentaEntradas(Scanner sc, String evento, String fecha) {
         boolean continuarComprando = true;
+        List<Ticket.Ticketdata> ticketsVentaActual = new ArrayList<>();
 
         while (continuarComprando) {
             SeatingMap.MostrarMapaAsientos();
@@ -56,9 +82,10 @@ public class TicketSale {
 
             // Procesar descuento y crear boleta
             Ticket ticketManager = new Ticket();
-            Ticket.Ticketdata ticketData = ticketManager.Descuento(sc, precioAsiento, coordenadaAsiento, zonaAsiento);
+            Ticket.Ticketdata ticketData = ticketManager.Descuento(sc, precioAsiento, coordenadaAsiento, zonaAsiento, evento, fecha);
 
-            //Guardar información boletas y agregar al listado
+            // Guardar información boletas y agregar al listado
+            ticketsVentaActual.add(ticketData);
             Ticket.Tickets.add(ticketData);
 
             // Reservar asiento
@@ -73,7 +100,38 @@ public class TicketSale {
             if (respuestaContinuar == 'n' || respuestaContinuar == 'N' ) {
                 continuarComprando = false;
                 System.out.println("Gracias por su compra!");
+                guardarResumenVenta(evento, fecha, ticketsVentaActual);
             }
         }
     }
+
+    public static void guardarResumenVenta(String evento, String fecha, List<Ticket.Ticketdata> tickets) {
+
+        VentaPorEvento ventaExistente = null;
+        for (VentaPorEvento venta : ventasPorEvento) {
+            if (venta.evento.equals(evento) && venta.fecha.equals(fecha)) {
+                ventaExistente = venta;
+                break;
+            }
+        }
+
+        if (ventaExistente == null) {
+            ventaExistente = new VentaPorEvento(evento, fecha);
+            ventasPorEvento.add(ventaExistente);
+        }
+
+        // Agregar todos los tickets a la venta
+        for (Ticket.Ticketdata ticket : tickets) {
+            ventaExistente.agregarTicket(ticket);
+        }
+
+        System.out.println("\n=== RESUMEN DE VENTA ===");
+        System.out.println("Evento: " + evento);
+        System.out.println("Fecha: " + fecha);
+        System.out.println("Asientos vendidos: " + tickets.size());
+        System.out.println("Total venta: $" + ventaExistente.total);
+        System.out.println("========================");
+    }
+
+
 }

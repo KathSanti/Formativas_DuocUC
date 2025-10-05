@@ -1,10 +1,8 @@
 package Formativas_DuocUC.Semana8;
 
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
+import static Formativas_DuocUC.Semana8.ShowEvents.GestorEventos.sc;
 import static Formativas_DuocUC.Semana8.TicketSale.ventasPorEvento;
 
 public class Ticket {
@@ -36,14 +34,14 @@ public class Ticket {
             this.rutCliente = rutCliente;
             this.nombreCliente = nombreCliente;
             this.edadCliente = edadCliente;
-            this.idticket = idticket;
+            this.idticket = idEvent+rutCliente;
             this.idEvent = idEvent;
             this.evento = evento;
             this.fecha = fecha;
         }
     }
 
-    public Ticketdata Descuento(Scanner sc, int precioAsiento, String codigoAsiento,
+    public Ticketdata AlamacenaDatosTickets (Scanner sc, int precioAsiento, String codigoAsiento,
                                 String zonaAsiento, String evento, String fecha) {
         int edad = 0;
         boolean edadValida = false;
@@ -90,30 +88,24 @@ public class Ticket {
             System.out.println("Sin descuento aplicado");
         }
 
-        // Cálculos
-        double descuento = precioAsiento * descuentoaplicado;
-        double totalapagar = precioAsiento - descuento;
-
-        System.out.println("========= RESUMEN DE COMPRA =========");
-        System.out.println("Precio original: $" + precioAsiento);
-        System.out.println("Evento: " + evento);
-        System.out.println("Fecha: " + fecha);
-        System.out.println("Descuento: $" + descuento);
-        System.out.println("Total a pagar: $" + totalapagar);
-        System.out.println("=====================================");
-        System.out.println(" ");
-
         // Solicitar datos del cliente
         System.out.print("Ingrese su RUT (sin puntos ni guión): ");
         int rut = sc.nextInt();
+        sc.nextLine();
 
         System.out.print("Ingrese su nombre: ");
         String nombre = sc.nextLine();
 
+        // Cálculos
+        double descuento = precioAsiento * descuentoaplicado;
+        double totalapagar = precioAsiento - descuento;
+
+
+
+
         return new Ticketdata(codigoAsiento, zonaAsiento, precioAsiento, descuento,
                 totalapagar, edad, rut, nombre, Tickets.size() + 1, 0, evento, fecha);
     }
-
 
 
     public static void mostrarResumenGeneral() {
@@ -126,24 +118,27 @@ public class Ticket {
         }
 
         double totalGeneral = 0;
+        double totalDescuentosGeneral = 0;
         int asientosTotales = 0;
 
         for (TicketSale.VentaPorEvento venta : ventasPorEvento) {
-            System.out.println("Evento: " + venta.evento);
-            System.out.println("Fecha: " + venta.fecha);
-            System.out.println("Asientos vendidos: " + venta.getCantidadAsientos());
-            System.out.println("Total: $" + venta.total);
+            System.out.println("Evento            : " + venta.evento);
+            System.out.println("Fecha             : " + venta.fecha);
+            System.out.println("Asientos vendidos : " + venta.getCantidadAsientos());
+            System.out.println("Descuentos        : $" + venta.totalDescuentos);
+            System.out.println("Total             : $" + venta.total);
             System.out.println("--------------------------------");
 
-            totalGeneral += venta.total;
+            totalGeneral    += venta.total;
+            totalDescuentosGeneral += venta.getTotalDescuentos();
             asientosTotales += venta.getCantidadAsientos();
         }
 
-        System.out.println("TOTAL GENERAL:");
-        System.out.println("Asientos vendidos: " + asientosTotales);
-        //agregar descuentos
-        System.out.println("Recaudación total: $" + totalGeneral);
-        System.out.println("=================================");
+        System.out.println("============= Total General =================");
+        System.out.println("Asientos vendidos : " + asientosTotales);
+        System.out.println("Descuentos        : $" + totalDescuentosGeneral);
+        System.out.println("Recaudación total : $" + totalGeneral);
+        System.out.println("=============================================");
     }
 
     public static void imprimirBoletas() {
@@ -175,5 +170,53 @@ public class Ticket {
         System.out.println("\n=======================================");
         System.out.println("¡Gracias por su visita al teatro Moro!");
         System.out.println("=======================================");
+
+        System.out.println("¿Desea confirmar la compra de tus asientos reservados?");
+        char respuestaCompra = sc.next().charAt(0);
+        sc.nextLine();
+
+
     }
+
+    public static boolean eliminarBoletaPorID() {
+
+        System.out.print("Ingrese número de boleta: ");
+        int id = FormatValidadors.ValidarNroEntero(sc);
+        sc.nextLine();
+
+
+        Iterator<Ticketdata> iterator = Tickets.iterator();
+        while (iterator.hasNext()) {
+            Ticketdata ticket = iterator.next();
+            if (id == ticket.idticket) {
+                liberarAsiento(ticket.asiento);
+                iterator.remove();
+                System.out.println("Boleta #" + id + " eliminada correctamente");
+                return true;
+            }
+        }
+        System.out.println("No se encontró la boleta con ID: " + id);
+        return false;
+    }
+
+
+
+
+    private static void liberarAsiento(String coordenadaAsiento) {
+        try {
+            char filaChar = coordenadaAsiento.charAt(0);
+            int fila = filaChar - 'A';
+            int columna = Integer.parseInt(coordenadaAsiento.substring(1)) - 1;
+
+            if (fila >= 0 && fila < 5 && columna >= 0 && columna < 6) {
+                SeatingMap.asientos[fila][columna] = false;
+
+            }
+        } catch (Exception e) {
+            System.out.println("Error al liberar el asiento: " + e.getMessage());
+        }
+    }
+
+
+
 }

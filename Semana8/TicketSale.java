@@ -11,21 +11,28 @@ public class TicketSale {
         public String fecha;
         public List<Ticket.Ticketdata> tickets;
         public double total;
+        public double totalDescuentos; // ← NUEVO: para almacenar descuentos
 
         public VentaPorEvento(String evento, String fecha) {
             this.evento = evento;
             this.fecha = fecha;
             this.tickets = new ArrayList<>();
             this.total = 0;
+            this.totalDescuentos = 0; // ← Inicializar
         }
 
         public void agregarTicket(Ticket.Ticketdata ticket) {
             this.tickets.add(ticket);
             this.total += ticket.totalPagar;
+            this.totalDescuentos += ticket.descuento; // ← NUEVO: acumular descuentos
         }
 
         public int getCantidadAsientos() {
             return tickets.size();
+        }
+
+        public double getTotalDescuentos() {
+            return totalDescuentos;
         }
     }
 
@@ -35,8 +42,14 @@ public class TicketSale {
         boolean continuarComprando = true;
         List<Ticket.Ticketdata> ticketsVentaActual = new ArrayList<>();
 
+        // Cargar el estado de asientos para este evento y fecha
+        MapaAsientosEstados.cargarEstado(evento, fecha);
+
         while (continuarComprando) {
+            // Mostrar mapa específico para este evento
+            System.out.println("\n=== MAPA DE ASIENTOS: " + evento + " - " + fecha + " ===");
             SeatingMap.MostrarMapaAsientos();
+
             FormatValidadors validadors = new FormatValidadors();
 
             System.out.print("Ingrese asiento (ej: A1, B5, E6): ");
@@ -47,66 +60,59 @@ public class TicketSale {
                 continue;
             }
 
+            // Verificar disponibilidad usando el nuevo sistema
+            if (!MapaAsientosEstados.verificarAsientoDisponible(evento, fecha, coordenadaAsiento)) {
+                System.out.println("Asiento no disponible para este evento/fecha.");
+                continue;
+            }
+
             char filaChar = coordenadaAsiento.charAt(0);
             int fila = filaChar - 'A';
             int columna = Integer.parseInt(coordenadaAsiento.substring(1)) - 1;
-
-            if (!validadors.validarRangoAsiento(fila, columna)) {
-                System.out.println("Asiento fuera de rango (fila A-E, columnas 1-6)");
-                continue;
-            }
-
-            if (SeatingMap.asientos[fila][columna]) {
-                System.out.println("[x] Ese asiento ya está ocupado, elija otro.");
-                continue;
-            }
-
-            if (SeatingMap.reservaPendiente[fila][columna]) {
-                System.out.println("[R] Ese asiento ya está reservado, escoja otro o espere a que se libere");
-                continue;
-            }
 
             int precioAsiento = SeatingMap.preciosUnitarios[fila];
             String zonaAsiento = SeatingMap.RowEntryType[fila];
             System.out.println("Asiento " + coordenadaAsiento + " - Precio: $" + precioAsiento + " - Zona: " + zonaAsiento);
 
             // Preguntar si quiere comprar este asiento
-            System.out.print("¿Deseas comprar este asiento? (S/N): ");
+            System.out.print("¿Deseas reservar este asiento? (S/N): ");
             char respuestaCompra = sc.next().charAt(0);
             sc.nextLine();
 
-            if (respuestaCompra != 'S' && respuestaCompra != 's'){
-                System.out.println("Compra cancelada para este asiento.");
+            if (respuestaCompra != 'S' && respuestaCompra != 's') {
+                System.out.println("Reserva cancelada para este asiento.");
                 continue;
             }
 
             // Procesar descuento y crear boleta
             Ticket ticketManager = new Ticket();
-            Ticket.Ticketdata ticketData = ticketManager.Descuento(sc, precioAsiento, coordenadaAsiento, zonaAsiento, evento, fecha);
+            Ticket.Ticketdata ticketData = ticketManager.AlamacenaDatosTickets(sc, precioAsiento, coordenadaAsiento, zonaAsiento, evento, fecha);
 
             // Guardar información boletas y agregar al listado
             ticketsVentaActual.add(ticketData);
             Ticket.Tickets.add(ticketData);
 
-            // Reservar asiento
-            SeatingMap.asientos[fila][columna] = true;
-            System.out.println("¡Compra confirmada! Asiento " + coordenadaAsiento + " reservado.");
+            // Reservar asiento (esto modifica SeatingMap temporalmente)
+            SeatingMap.reservaPendiente[fila][columna] = true;
+            System.out.println("¡Reserva confirmada! Asiento " + coordenadaAsiento + " reservado.");
 
             // Preguntar si quiere comprar otro asiento
-            System.out.print("¿Desea comprar otro asiento? (S/N): ");
+            System.out.print("¿Deseas reservar otro asiento? (S/N): ");
             char respuestaContinuar = sc.next().charAt(0);
             sc.nextLine();
 
-            if (respuestaContinuar == 'n' || respuestaContinuar == 'N' ) {
+            if (respuestaContinuar == 'n' || respuestaContinuar == 'N') {
                 continuarComprando = false;
-                System.out.println("Gracias por su compra!");
+                System.out.println("Por favor dirigete a imprimir boletas en menu para confirmar tu compra");
+
+
+                MapaAsientosEstados.guardarEstadoActual(evento, fecha);
                 guardarResumenVenta(evento, fecha, ticketsVentaActual);
             }
         }
     }
 
     public static void guardarResumenVenta(String evento, String fecha, List<Ticket.Ticketdata> tickets) {
-
         VentaPorEvento ventaExistente = null;
         for (VentaPorEvento venta : ventasPorEvento) {
             if (venta.evento.equals(evento) && venta.fecha.equals(fecha)) {
@@ -125,12 +131,13 @@ public class TicketSale {
             ventaExistente.agregarTicket(ticket);
         }
 
-        System.out.println("\n=== RESUMEN DE VENTA ===");
-        System.out.println("Evento: " + evento);
-        System.out.println("Fecha: " + fecha);
-        System.out.println("Asientos vendidos: " + tickets.size());
-        System.out.println("Total venta: $" + ventaExistente.total);
-        System.out.println("========================");
+        System.out.println("\n========== RESUMEN DE VENTA ==========");
+        System.out.println("Evento            : " + evento);
+        System.out.println("Fecha             : " + fecha);
+        System.out.println("Asientos vendidos : " + tickets.size());
+        System.out.println("Total Descuentos  : $" + ventaExistente.getTotalDescuentos()); // ← NUEVO
+        System.out.println("Total venta       : $" + ventaExistente.total);
+        System.out.println("======================================");
     }
 
 

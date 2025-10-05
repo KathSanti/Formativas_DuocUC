@@ -22,7 +22,8 @@ public class HomeTeatroMoro {
             System.out.println("1) Venta de entradas");
             System.out.println("2) Resumen de Ventas");
             System.out.println("3) Generar Boleta");
-            System.out.println("4) Salir");
+            System.out.println("4) Eliminar Boleta");
+            System.out.println("5) Salir");
 
             System.out.print("Opción: ");
             opcionMenu = FormatValidadors.ValidarNroEntero(sc);
@@ -50,6 +51,9 @@ public class HomeTeatroMoro {
                     }
                     break;
                 case 4:
+                    Ticket.eliminarBoletaPorID();
+                    break;
+                case 5:
                     salir = bucleopcioncuatro(sc);
                     break;
 
@@ -68,7 +72,7 @@ public class HomeTeatroMoro {
 
 
 
-}
+    }
 
     private static boolean bucleMenuVolver(Scanner sc) {
         char confirma;
@@ -82,6 +86,7 @@ public class HomeTeatroMoro {
             System.out.print("Ingrese una opción válida (S/N): ");
             confirma = sc.next().charAt(0);
             sc.nextLine();
+            System.out.println(" ");
         }
 
         if (confirma == 'N' || confirma == 'n') {

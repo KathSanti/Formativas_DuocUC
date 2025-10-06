@@ -8,6 +8,8 @@ import java.util.Scanner;
 
 public class ShowEvents {
 
+    //Clase para manejar lista de eventos y fechas y poder utilizarala para manejarla junto lo asientos en Mapaasiento estado
+
     static class ShowEvent {
         int idEvent;
         String nameEvent;
@@ -30,23 +32,6 @@ public class ShowEvents {
             }
         }
 
-        //eliminar clase que no corresponden y optimizar codigo
-
-        public void addTicket(Ticket.Ticketdata ticket) {
-            tickets.add(ticket);
-        }
-
-        public double getTotal(){
-            double total = 0;
-            for (Ticket.Ticketdata ticket : tickets) {
-                total += ticket.totalPagar;
-            }
-            return total;
-        }
-
-        public int getCantidadTickets() {
-            return tickets.size();
-        }
     }
 
     static class GestorEventos {
@@ -144,9 +129,6 @@ public class ShowEvents {
             return null;
         }
 
-        // obtener todos los eventos
-        public static List<ShowEvent> getEventos() {
-            return eventos;
-        }
+
     }
 }

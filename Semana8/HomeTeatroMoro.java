@@ -19,10 +19,10 @@ public class HomeTeatroMoro {
             System.out.println("========================================================================");
             System.out.println(" ");
             System.out.println("Por favor escoge una opción");
-            System.out.println("1) Venta de entradas");
+            System.out.println("1) Rerserva de entradas");
             System.out.println("2) Resumen de Ventas");
-            System.out.println("3) Generar Boleta");
-            System.out.println("4) Eliminar Boleta");
+            System.out.println("3) Imprimir boleta");
+            System.out.println("4) Eliminar reserva");
             System.out.println("5) Salir");
 
             System.out.print("Opción: ");
@@ -91,7 +91,7 @@ public class HomeTeatroMoro {
 
         if (confirma == 'N' || confirma == 'n') {
             System.out.println("Gracias por su compra. ¡Hasta pronto!");
-            return false; // No volver al menú
+            return false; // Mensaje de despedida al usuario
         }
 
         return true; // Volver al menú

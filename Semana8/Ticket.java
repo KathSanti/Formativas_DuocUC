@@ -2,6 +2,7 @@ package Formativas_DuocUC.Semana8;
 
 import java.util.*;
 
+
 import static Formativas_DuocUC.Semana8.ShowEvents.GestorEventos.sc;
 import static Formativas_DuocUC.Semana8.TicketSale.ventasPorEvento;
 
@@ -18,14 +19,14 @@ public class Ticket {
         int rutCliente;
         String nombreCliente;
         int edadCliente;
-        int idticket;
+        String idticket;
         int idEvent;
         public String evento;
         public String fecha;
 
         public Ticketdata(String asiento, String zona, int precioOriginal, double descuento,
                           double totalPagar, int edadCliente, int rutCliente, String nombreCliente,
-                          int idticket, int idEvent, String evento, String fecha) {
+                          int idEvent, String evento, String fecha) {
             this.asiento = asiento;
             this.zona = zona;
             this.precioOriginal = precioOriginal;
@@ -34,15 +35,20 @@ public class Ticket {
             this.rutCliente = rutCliente;
             this.nombreCliente = nombreCliente;
             this.edadCliente = edadCliente;
-            this.idticket = idEvent+rutCliente;
             this.idEvent = idEvent;
             this.evento = evento;
             this.fecha = fecha;
+
+            this.idticket = generarNumeroOrden(idEvent, rutCliente, asiento);
+        }
+
+
+        public String getNumeroOrden() {
+            return this.idticket;
         }
     }
 
-    public Ticketdata AlamacenaDatosTickets (Scanner sc, int precioAsiento, String codigoAsiento,
-                                String zonaAsiento, String evento, String fecha) {
+    public Ticketdata AlamacenaDatosTickets(Scanner sc, int precioAsiento, String codigoAsiento, String zonaAsiento, String evento, String fecha, int idEvent) {
         int edad = 0;
         boolean edadValida = false;
         double descuentoaplicado = 0;
@@ -101,17 +107,13 @@ public class Ticket {
         double totalapagar = precioAsiento - descuento;
 
 
-
-
-        return new Ticketdata(codigoAsiento, zonaAsiento, precioAsiento, descuento,
-                totalapagar, edad, rut, nombre, Tickets.size() + 1, 0, evento, fecha);
+        return new Ticketdata(codigoAsiento, zonaAsiento, precioAsiento, descuento, totalapagar, edad, rut, nombre, idEvent, evento, fecha);
     }
 
 
     public static void mostrarResumenGeneral() {
-        System.out.println("\n=== RESUMEN GENERAL DE VENTAS ===");
+        System.out.println("\n==== RESUMEN GENERAL DE VENTAS ====");
         if (ventasPorEvento.isEmpty()) {
-            System.out.println("=====================================");
             System.out.println("    Aún no hay ventas realizadas.    ");
             System.out.println("=====================================");
             return;
@@ -129,7 +131,7 @@ public class Ticket {
             System.out.println("Total             : $" + venta.total);
             System.out.println("--------------------------------");
 
-            totalGeneral    += venta.total;
+            totalGeneral += venta.total;
             totalDescuentosGeneral += venta.getTotalDescuentos();
             asientosTotales += venta.getCantidadAsientos();
         }
@@ -154,7 +156,7 @@ public class Ticket {
         for (int i = 0; i < Tickets.size(); i++) {
             Ticketdata ticketdata = Tickets.get(i);
             System.out.println("\n--- Boleta #" + (i + 1) + " ---");
-            System.out.println("N° de compra   : " + ticketdata.idticket);
+            System.out.println("N° de orden    : " + ticketdata.getNumeroOrden());
             System.out.println("Evento         : " + ticketdata.evento);
             System.out.println("Fecha          : " + ticketdata.fecha);
             System.out.println("Asiento        : " + ticketdata.asiento);
@@ -171,36 +173,58 @@ public class Ticket {
         System.out.println("¡Gracias por su visita al teatro Moro!");
         System.out.println("=======================================");
 
-        System.out.println("¿Desea confirmar la compra de tus asientos reservados?");
-        char respuestaCompra = sc.next().charAt(0);
+        System.out.print("¿Desea confirmar la compra de tus asientos reservados? (S/N): ");
+        char respuestaCompra = sc.next().toUpperCase().charAt(0);
         sc.nextLine();
 
-
+        if (respuestaCompra == 'S') {
+            confirmarCompraAsientos();
+            System.out.println("¡Compra confirmada! Los asientos ahora están ocupados.");
+            Tickets.clear();
+        } else {
+            System.out.println("Compra no confirmada. Los asientos permanecen como reservados.");
+            System.out.println("Si deseas eliminar tu reserva dirigete en menú Eliminar rerserva y allí con tú Número de orden podrás eliminarla");
+        }
     }
 
-    public static boolean eliminarBoletaPorID() {
+    public static String generarNumeroOrden(int idEvent, int rutCliente, String asiento) {
+        return String.format("%d-%s-%d", idEvent, asiento, rutCliente);
+    }
 
-        System.out.print("Ingrese número de boleta: ");
-        int id = FormatValidadors.ValidarNroEntero(sc);
-        sc.nextLine();
+    public static void confirmarCompraAsientos() {
+        for (Ticketdata ticket : Tickets) {
+            MapaAsientosEstados.confirmarAsientoComoOcupado(ticket.evento, ticket.fecha, ticket.asiento);
+        }
 
+        // Actualizar estadísticas de ventas
+        actualizarVentasPorEvento();
+    }
 
-        Iterator<Ticketdata> iterator = Tickets.iterator();
-        while (iterator.hasNext()) {
-            Ticketdata ticket = iterator.next();
-            if (id == ticket.idticket) {
-                liberarAsiento(ticket.asiento);
-                iterator.remove();
-                System.out.println("Boleta #" + id + " eliminada correctamente");
-                return true;
+    private static void actualizarVentasPorEvento() {
+        for (Ticketdata ticket : Tickets) {
+            boolean encontrado = false;
+
+            // Buscar si ya existe una venta para este evento
+            for (TicketSale.VentaPorEvento venta : ventasPorEvento) {
+                if (venta.evento.equals(ticket.evento) && venta.fecha.equals(ticket.fecha)) {
+                    venta.total += ticket.totalPagar;
+                    venta.totalDescuentos += ticket.descuento;
+                    venta.cantidadAsientos++;
+                    encontrado = true;
+                    break;
+                }
+            }
+
+            // Si no existe, crear nueva venta
+            if (!encontrado) {
+                TicketSale.VentaPorEvento nuevaVenta = new TicketSale.VentaPorEvento(ticket.evento, ticket.fecha);
+                nuevaVenta.total = ticket.totalPagar;
+                nuevaVenta.totalDescuentos = ticket.descuento;
+                nuevaVenta.cantidadAsientos = 1;
+                ventasPorEvento.add(nuevaVenta);
             }
         }
-        System.out.println("No se encontró la boleta con ID: " + id);
-        return false;
     }
-
-
-
 
     private static void liberarAsiento(String coordenadaAsiento) {
         try {
@@ -218,5 +242,94 @@ public class Ticket {
     }
 
 
+    private static void liberarAsientosReservados() {
+        for (Ticketdata ticket : Tickets) {
+            liberarAsiento(ticket.asiento);
+        }
+        // Limpiar la lista de tickets temporales
+        Tickets.clear();
+    }
 
+    public static boolean eliminarBoletaPorID() {
+        if (Tickets.isEmpty()) {
+            System.out.println("No hay boletas para eliminar.");
+            return false;
+        }
+
+        System.out.print("Ingrese número de boleta: ");
+        String id = sc.nextLine();
+
+        // Buscar la boleta
+        for (int i = 0; i < Tickets.size(); i++) {
+            Ticketdata ticket = Tickets.get(i);
+            if (id.equals(ticket.idticket)) {
+                // Liberar el asiento
+                liberarAsientoCompleto(ticket.asiento, ticket.evento, ticket.fecha);
+
+                // Eliminar de las ventas por evento
+                eliminarDeVentasPorEvento(ticket);
+
+                // Eliminar la boleta
+                Tickets.remove(i);
+
+                System.out.println("Boleta #" + id + " eliminada correctamente");
+                System.out.println("Asiento " + ticket.asiento + " liberado");
+                return true;
+            }
+        }
+
+        System.out.println("No se encontró la boleta con ID: " + id);
+        return false;
+    }
+
+    //  liberar asiento en todos los sistemas
+    private static void liberarAsientoCompleto(String coordenadaAsiento, String evento, String fecha) {
+        try {
+            char filaChar = coordenadaAsiento.charAt(0);
+            int fila = filaChar - 'A';
+            int columna = Integer.parseInt(coordenadaAsiento.substring(1)) - 1;
+
+            if (fila >= 0 && fila < 5 && columna >= 0 && columna < 6) {
+                // Liberar en mapa general
+                SeatingMap.asientos[fila][columna] = false;
+                SeatingMap.reservaPendiente[fila][columna] = false;
+
+                // Liberar en estado específico del evento
+                MapaAsientosEstados.EstadoAsientosEvento estado =
+                        MapaAsientosEstados.obtenerEstadoAsientos(evento, fecha);
+                estado.asientos[fila][columna] = false;
+                estado.reservaPendiente[fila][columna] = false;
+                MapaAsientosEstados.guardarEstadoActual(evento, fecha);
+            }
+        } catch (Exception e) {
+            System.out.println("Error al liberar el asiento: " + e.getMessage());
+        }
+
+    }
+
+    // eliminar la boleta de las ventas por evento
+    private static void eliminarDeVentasPorEvento(Ticketdata ticket) {
+        // Buscar la venta correspondiente al evento y fecha
+        for (int i = 0; i < ventasPorEvento.size(); i++) {
+            TicketSale.VentaPorEvento venta = ventasPorEvento.get(i);
+
+            if (venta.evento.equals(ticket.evento) && venta.fecha.equals(ticket.fecha)) {
+                // Restar los valores de esta boleta de la venta
+                venta.total -= ticket.totalPagar;
+                venta.totalDescuentos -= ticket.descuento;
+                venta.cantidadAsientos--;
+
+                // Si ya no hay asientos en esta venta, eliminarla completamente
+                if (venta.cantidadAsientos <= 0) {
+                    ventasPorEvento.remove(i);
+                    System.out.println("Venta del evento " + ticket.evento + " eliminada (sin asientos)");
+                } else {
+                    System.out.println("Venta actualizada: " + venta.cantidadAsientos + " asientos restantes");
+                }
+                break;
+            }
+        }
+    }
 }
+
+

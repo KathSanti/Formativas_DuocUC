@@ -35,6 +35,23 @@ public class MapaAsientosEstados {
                 System.arraycopy(this.reservaPendiente[i], 0, SeatingMap.reservaPendiente[i], 0, 6);
             }
         }
+
+
+        public void marcarAsientoComoOcupado(String coordenadaAsiento) {
+            try {
+                char filaChar = coordenadaAsiento.charAt(0);
+                int fila = filaChar - 'A';
+                int columna = Integer.parseInt(coordenadaAsiento.substring(1)) - 1;
+
+                if (fila >= 0 && fila < 5 && columna >= 0 && columna < 6) {
+                    this.asientos[fila][columna] = true;
+                    this.reservaPendiente[fila][columna] = false;
+                    System.out.println("Asiento " + coordenadaAsiento + " marcado como ocupado para " + evento + " - " + fecha);
+                }
+            } catch (Exception e) {
+                System.out.println("Error al confirmar el asiento en el estado: " + e.getMessage());
+            }
+        }
     }
 
     // Mapa para almacenar los estados por evento y fecha
@@ -71,8 +88,6 @@ public class MapaAsientosEstados {
         estado.restaurarEstado();
     }
 
-
-
     // Verificar si un asiento está disponible para un evento-fecha
     public static boolean verificarAsientoDisponible(String evento, String fecha, String coordenadaAsiento) {
         cargarEstado(evento, fecha);
@@ -94,4 +109,31 @@ public class MapaAsientosEstados {
     }
 
 
+    public static void confirmarAsientoComoOcupado(String evento, String fecha, String coordenadaAsiento) {
+        // Actualizar el estado específico del evento
+        EstadoAsientosEvento estado = obtenerEstadoAsientos(evento, fecha);
+        estado.marcarAsientoComoOcupado(coordenadaAsiento);
+
+        // Actualizar también el mapa general
+        marcarAsientoComoOcupadoEnMapaGeneral(coordenadaAsiento);
+
+        // Guardar el estado actualizado
+        guardarEstadoActual(evento, fecha);
+    }
+
+
+    private static void marcarAsientoComoOcupadoEnMapaGeneral(String coordenadaAsiento) {
+        try {
+            char filaChar = coordenadaAsiento.charAt(0);
+            int fila = filaChar - 'A';
+            int columna = Integer.parseInt(coordenadaAsiento.substring(1)) - 1;
+
+            if (fila >= 0 && fila < 5 && columna >= 0 && columna < 6) {
+                SeatingMap.asientos[fila][columna] = true;
+                SeatingMap.reservaPendiente[fila][columna] = false;
+            }
+        } catch (Exception e) {
+            System.out.println("Error al confirmar el asiento en el mapa general: " + e.getMessage());
+        }
+    }
 }

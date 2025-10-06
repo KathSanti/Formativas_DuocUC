@@ -11,14 +11,17 @@ public class TicketSale {
         public String fecha;
         public List<Ticket.Ticketdata> tickets;
         public double total;
-        public double totalDescuentos; // ← NUEVO: para almacenar descuentos
+        public double totalDescuentos;
+        public int cantidadAsientos;
 
         public VentaPorEvento(String evento, String fecha) {
             this.evento = evento;
             this.fecha = fecha;
             this.tickets = new ArrayList<>();
             this.total = 0;
-            this.totalDescuentos = 0; // ← Inicializar
+            this.totalDescuentos = 0;
+            this.cantidadAsientos = 0;
+
         }
 
         public void agregarTicket(Ticket.Ticketdata ticket) {
@@ -41,6 +44,8 @@ public class TicketSale {
     public static void VentaEntradas(Scanner sc, String evento, String fecha) {
         boolean continuarComprando = true;
         List<Ticket.Ticketdata> ticketsVentaActual = new ArrayList<>();
+
+        int idEvent = obtenerIdEventoPorNombre(evento);
 
         // Cargar el estado de asientos para este evento y fecha
         MapaAsientosEstados.cargarEstado(evento, fecha);
@@ -86,7 +91,7 @@ public class TicketSale {
 
             // Procesar descuento y crear boleta
             Ticket ticketManager = new Ticket();
-            Ticket.Ticketdata ticketData = ticketManager.AlamacenaDatosTickets(sc, precioAsiento, coordenadaAsiento, zonaAsiento, evento, fecha);
+            Ticket.Ticketdata ticketData = ticketManager.AlamacenaDatosTickets(sc, precioAsiento, coordenadaAsiento, zonaAsiento, evento, fecha, idEvent);
 
             // Guardar información boletas y agregar al listado
             ticketsVentaActual.add(ticketData);
@@ -110,6 +115,15 @@ public class TicketSale {
                 guardarResumenVenta(evento, fecha, ticketsVentaActual);
             }
         }
+    }
+
+    private static int obtenerIdEventoPorNombre(String nombreEvento) {
+        for (ShowEvents.ShowEvent evento : ShowEvents.GestorEventos.eventos) {
+            if (evento.nameEvent.equals(nombreEvento)) {
+                return evento.idEvent;
+            }
+        }
+        return 0; // O manejar el error
     }
 
     public static void guardarResumenVenta(String evento, String fecha, List<Ticket.Ticketdata> tickets) {

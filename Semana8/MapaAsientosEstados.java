@@ -109,6 +109,10 @@ public class MapaAsientosEstados {
     }
 
 
+
+    //Metodo para gestionar el estado de los asientos reservados a ocupados
+
+
     public static void confirmarAsientoComoOcupado(String evento, String fecha, String coordenadaAsiento) {
         // Actualizar el estado específico del evento
         EstadoAsientosEvento estado = obtenerEstadoAsientos(evento, fecha);
@@ -120,6 +124,8 @@ public class MapaAsientosEstados {
         // Guardar el estado actualizado
         guardarEstadoActual(evento, fecha);
     }
+
+    //Metodo para actaulizar en mapa general el estado ocupado de los asientos
 
 
     private static void marcarAsientoComoOcupadoEnMapaGeneral(String coordenadaAsiento) {

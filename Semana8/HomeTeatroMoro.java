@@ -74,7 +74,7 @@ public class HomeTeatroMoro {
 
     }
 
-    private static boolean bucleMenuVolver(Scanner sc) {
+    public static boolean bucleMenuVolver(Scanner sc) {
         char confirma;
 
         System.out.print("¿Deseas volver al menú principal? (S/N): ");

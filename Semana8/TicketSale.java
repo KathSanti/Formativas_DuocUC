@@ -6,6 +6,9 @@ import java.util.Scanner;
 
 public class TicketSale {
 
+
+    //Clase para poder almacenar las ventas por evento
+
     public static class VentaPorEvento {
         public String evento;
         public String fecha;
@@ -24,26 +27,37 @@ public class TicketSale {
 
         }
 
+        //Metodo para almacenar descuentos
+
         public void agregarTicket(Ticket.Ticketdata ticket) {
             this.tickets.add(ticket);
             this.total += ticket.totalPagar;
-            this.totalDescuentos += ticket.descuento; // ← NUEVO: acumular descuentos
+            this.totalDescuentos += ticket.descuento;
         }
+
+        //Metodo rapido para obtener la cantidad de asientos vendidos en la clase ticket
 
         public int getCantidadAsientos() {
             return tickets.size();
         }
+
+        //Metodo rapido para obtener total descuento en la clase ticket
 
         public double getTotalDescuentos() {
             return totalDescuentos;
         }
     }
 
+
+    //Creación de lista array para almacenar las ventas por evento de la clase venta por evento
+
     public static List<VentaPorEvento> ventasPorEvento = new ArrayList<>();
 
     public static void VentaEntradas(Scanner sc, String evento, String fecha) {
         boolean continuarComprando = true;
         List<Ticket.Ticketdata> ticketsVentaActual = new ArrayList<>();
+
+        //Obtener id evento para añadir en la clase  ticket para que el usuario pueda gestionar su reserva
 
         int idEvent = obtenerIdEventoPorNombre(evento);
 
@@ -65,11 +79,13 @@ public class TicketSale {
                 continue;
             }
 
-            // Verificar disponibilidad usando el nuevo sistema
+            // Verificar disponibilidad usando el nuevo sistema haspMap Mejora sugerida por el profe jorge :)
             if (!MapaAsientosEstados.verificarAsientoDisponible(evento, fecha, coordenadaAsiento)) {
                 System.out.println("Asiento no disponible para este evento/fecha.");
                 continue;
             }
+
+
 
             char filaChar = coordenadaAsiento.charAt(0);
             int fila = filaChar - 'A';
@@ -111,11 +127,18 @@ public class TicketSale {
                 System.out.println("Por favor dirigete a imprimir boletas en menu para confirmar tu compra");
 
 
+
+                //LLamar metodos de la clase MapaAsientosEstados para almacenar la información del usuario para gestionar su boleta y resumen de ventas
+
+
                 MapaAsientosEstados.guardarEstadoActual(evento, fecha);
                 guardarResumenVenta(evento, fecha, ticketsVentaActual);
             }
         }
     }
+
+
+    //Metodo para obtener ID del evento por el nombre
 
     private static int obtenerIdEventoPorNombre(String nombreEvento) {
         for (ShowEvents.ShowEvent evento : ShowEvents.GestorEventos.eventos) {
@@ -125,6 +148,8 @@ public class TicketSale {
         }
         return 0; // O manejar el error
     }
+
+    //Metodo para guardar la información del usuario para mostar ventas por evento y mostar resumen de ventas
 
     public static void guardarResumenVenta(String evento, String fecha, List<Ticket.Ticketdata> tickets) {
         VentaPorEvento ventaExistente = null;
@@ -149,7 +174,7 @@ public class TicketSale {
         System.out.println("Evento            : " + evento);
         System.out.println("Fecha             : " + fecha);
         System.out.println("Asientos vendidos : " + tickets.size());
-        System.out.println("Total Descuentos  : $" + ventaExistente.getTotalDescuentos()); // ← NUEVO
+        System.out.println("Total Descuentos  : $" + ventaExistente.getTotalDescuentos());
         System.out.println("Total venta       : $" + ventaExistente.total);
         System.out.println("======================================");
     }

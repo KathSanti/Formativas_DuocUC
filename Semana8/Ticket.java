@@ -8,7 +8,13 @@ import static Formativas_DuocUC.Semana8.TicketSale.ventasPorEvento;
 
 public class Ticket {
 
+
+    //Array para almacenar la información de forma variable por los usuarios
+
     public static ArrayList<Ticketdata> Tickets = new ArrayList<>();
+
+
+    //Clase para manejar los elementos del ticket
 
     public static class Ticketdata {
         String asiento;
@@ -24,9 +30,8 @@ public class Ticket {
         public String evento;
         public String fecha;
 
-        public Ticketdata(String asiento, String zona, int precioOriginal, double descuento,
-                          double totalPagar, int edadCliente, int rutCliente, String nombreCliente,
-                          int idEvent, String evento, String fecha) {
+        public Ticketdata(String asiento, String zona, int precioOriginal, double descuento,  double totalPagar, int edadCliente, int rutCliente, String nombreCliente, int idEvent, String evento, String fecha) {
+
             this.asiento = asiento;
             this.zona = zona;
             this.precioOriginal = precioOriginal;
@@ -38,6 +43,9 @@ public class Ticket {
             this.idEvent = idEvent;
             this.evento = evento;
             this.fecha = fecha;
+
+
+
 
             this.idticket = generarNumeroOrden(idEvent, rutCliente, asiento);
         }
@@ -183,12 +191,14 @@ public class Ticket {
             Tickets.clear();
         } else {
             System.out.println("Compra no confirmada. Los asientos permanecen como reservados.");
-            System.out.println("Si deseas eliminar tu reserva dirigete en menú Eliminar rerserva y allí con tú Número de orden podrás eliminarla");
+            System.out.println("Si deseas eliminar tu reserva dirigete en menú opción : 3) Eliminar rerserva");
+            System.out.println("Allí con tú Número de orden podrás eliminarla");
+            System.out.println(" ");
         }
     }
 
     public static String generarNumeroOrden(int idEvent, int rutCliente, String asiento) {
-        return String.format("%d-%s-%d", idEvent, asiento, rutCliente);
+        return String.format("%d-%s-%d", idEvent, asiento, rutCliente); //Texto esturcturado visto en taller 2
     }
 
     public static void confirmarCompraAsientos() {
@@ -196,7 +206,7 @@ public class Ticket {
             MapaAsientosEstados.confirmarAsientoComoOcupado(ticket.evento, ticket.fecha, ticket.asiento);
         }
 
-        // Actualizar estadísticas de ventas
+        // Actualizar resumen de ventas
         actualizarVentasPorEvento();
     }
 
@@ -212,10 +222,13 @@ public class Ticket {
                     venta.cantidadAsientos++;
                     encontrado = true;
                     break;
+                    //Si existe no lo actualiza
                 }
             }
 
-            // Si no existe, crear nueva venta
+            //Si no existe lo añade a lista para mostrar en resumen de ventas
+
+
             if (!encontrado) {
                 TicketSale.VentaPorEvento nuevaVenta = new TicketSale.VentaPorEvento(ticket.evento, ticket.fecha);
                 nuevaVenta.total = ticket.totalPagar;
@@ -226,37 +239,16 @@ public class Ticket {
         }
     }
 
-    private static void liberarAsiento(String coordenadaAsiento) {
-        try {
-            char filaChar = coordenadaAsiento.charAt(0);
-            int fila = filaChar - 'A';
-            int columna = Integer.parseInt(coordenadaAsiento.substring(1)) - 1;
 
-            if (fila >= 0 && fila < 5 && columna >= 0 && columna < 6) {
-                SeatingMap.asientos[fila][columna] = false;
-
-            }
-        } catch (Exception e) {
-            System.out.println("Error al liberar el asiento: " + e.getMessage());
-        }
-    }
-
-
-    private static void liberarAsientosReservados() {
-        for (Ticketdata ticket : Tickets) {
-            liberarAsiento(ticket.asiento);
-        }
-        // Limpiar la lista de tickets temporales
-        Tickets.clear();
-    }
+    //Metodos para eliminar boletas por ID desde la opción tres en menu
 
     public static boolean eliminarBoletaPorID() {
         if (Tickets.isEmpty()) {
-            System.out.println("No hay boletas para eliminar.");
+            System.out.println("No hay boletas para eliminar."); //Si no hay reservas mostrar este mensaje
             return false;
         }
 
-        System.out.print("Ingrese número de boleta: ");
+        System.out.print("Ingrese número de boleta: "); //ingresa id especifico de su evento
         String id = sc.nextLine();
 
         // Buscar la boleta
@@ -279,10 +271,11 @@ public class Ticket {
         }
 
         System.out.println("No se encontró la boleta con ID: " + id);
+        System.out.println("Para poder ver el número de orden de tu boleta" + HomeTeatroMoro.bucleMenuVolver(sc));
         return false;
     }
 
-    //  liberar asiento en todos los sistemas
+    //  liberar asiento en todos los metodos y listas
     private static void liberarAsientoCompleto(String coordenadaAsiento, String evento, String fecha) {
         try {
             char filaChar = coordenadaAsiento.charAt(0);
@@ -291,12 +284,11 @@ public class Ticket {
 
             if (fila >= 0 && fila < 5 && columna >= 0 && columna < 6) {
                 // Liberar en mapa general
-                SeatingMap.asientos[fila][columna] = false;
-                SeatingMap.reservaPendiente[fila][columna] = false;
+                SeatingMap.asientos[fila][columna] = false; //cambia estado
+                SeatingMap.reservaPendiente[fila][columna] = false;//cambia estado
 
                 // Liberar en estado específico del evento
-                MapaAsientosEstados.EstadoAsientosEvento estado =
-                        MapaAsientosEstados.obtenerEstadoAsientos(evento, fecha);
+                MapaAsientosEstados.EstadoAsientosEvento estado = MapaAsientosEstados.obtenerEstadoAsientos(evento, fecha);
                 estado.asientos[fila][columna] = false;
                 estado.reservaPendiente[fila][columna] = false;
                 MapaAsientosEstados.guardarEstadoActual(evento, fecha);

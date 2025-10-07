@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class ShowEvents {
 
-    //Clase para manejar lista de eventos y fechas y poder utilizarala para manejarla junto lo asientos en Mapaasiento estado
+    //Clase para manejar lista de eventos y fechas y poder utilizarla para manejarla junto los asientos en Mapaasiento estado
 
     static class ShowEvent {
         int idEvent;
@@ -32,7 +32,9 @@ public class ShowEvents {
             }
         }
 
+
     }
+    //Clase array para añadir evento y fechas por eventos
 
     static class GestorEventos {
         static List<ShowEvent> eventos = new ArrayList<>();
@@ -63,6 +65,11 @@ public class ShowEvents {
         }
 
 
+
+
+
+        //Clase para imprimir por pantalla y escoger evntos por el usuario
+
         public static void mostrarEventos() {
 
 
@@ -86,6 +93,8 @@ public class ShowEvents {
 
         }
 
+        //Clase para recorrer las fechas por eventos con for e imprimir por pantalla
+
         public static void seleccionarFecha(ShowEvent evento) {
             System.out.println("\n========== FECHAS DISPONIBLES ==========");
             System.out.println("Evento: " + evento.nameEvent);
@@ -107,6 +116,9 @@ public class ShowEvents {
             }
         }
 
+
+        //Metodo para impimir por pnatalla la opción esgogida al usuario y guardar la información en la boleta en clase tiketsale
+
         public static void seleccionarButacas(ShowEvent evento, String fecha) {
             System.out.println("\n========== Seleciona tu asiento ==========");
             System.out.println("Evento: " + evento.nameEvent);
@@ -118,8 +130,8 @@ public class ShowEvents {
 
 
 
+        //Metodo para buscar ID del evento para que luego el usuario pueda eliminar su reserva si lo desea
 
-        // Buscar evento por ID
         public static ShowEvent buscarEvento(int idEvent) {
             for (ShowEvent evento : eventos) {
                 if (evento.idEvent == idEvent) {

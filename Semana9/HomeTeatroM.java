@@ -1,8 +1,5 @@
 package Formativas_DuocUC.Semana9;
 
-import Formativas_DuocUC.Semana8.FormatValidadors;
-import Formativas_DuocUC.Semana8.ShowEvents;
-import Formativas_DuocUC.Semana8.Ticket;
 
 import java.util.Scanner;
 
@@ -30,30 +27,31 @@ public class HomeTeatroM {
             System.out.println("5) Salir");
 
             System.out.print("Opción: ");
-            opcionMenu = FormatValidadors.ValidarNroEntero(sc);
+            opcionMenu = ValidacionesEntradas.ValidarNroEntero(sc);
 
             switch (opcionMenu){
                 case 1:
-
-
+                    GestionReservas.ventasReserva(sc);
                     if (!bucleMenuVolver(sc)) {
                         salir = true;
                     }
                     break;
 
                 case 2:
-
+                    BoletaVentas.mostrarResumenGeneral();
                     if (!bucleMenuVolver(sc)) {
                         salir = true;
                     }
                     break;
                 case 3:
-
+                    BoletaVentas.imprimirBoletas();
                     if (!bucleMenuVolver(sc)) {
                         salir = true;
                     }
                     break;
                 case 4:
+                    BoletaVentas.eliminarReserva();
+
 
                     break;
                 case 5:

@@ -1,20 +1,23 @@
 package Formativas_DuocUC.Semana9;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import Formativas_DuocUC.Semana8.Ticket;
+
 
 public class GestionReservas {
 
+
+
     public static class VentaGeneral {
-        public List<Ticket.Ticketdata> tickets;
+        public List<BoletaVentas.Ticketdata> tickets;
         public double total;
         public double totalDescuentos;
         public int cantidadAsientos;
 
-        public ventaGeneral() {
+        public VentaGeneral() {
 
             this.tickets = new ArrayList<>();
             this.total = 0;
@@ -25,10 +28,10 @@ public class GestionReservas {
 
         //Metodo para almacenar descuentos
 
-        public void agregarTicket(Ticket.Ticketdata ticket) {
-            this.tickets.add(ticket);
-            this.total += ticket.totalPagar;
-            this.totalDescuentos += ticket.descuento;
+        public void agregarTicket(BoletaVentas.Ticketdata BoletaVentas) {
+            this.tickets.add(BoletaVentas);
+            this.total += BoletaVentas.totalPagar;
+            this.totalDescuentos += BoletaVentas.descuento;
         }
 
         //Metodo rapido para obtener la cantidad de asientos vendidos en la clase ticket
@@ -43,6 +46,8 @@ public class GestionReservas {
             return totalDescuentos;
         }
     }
+
+    public static List<GestionReservas.VentaGeneral> VentaGeneral = new ArrayList<>();
 
 
 
@@ -67,7 +72,7 @@ public class GestionReservas {
 
             // Verificar disponibilidad usando el nuevo sistema haspMap Mejora sugerida por el profe jorge :)
             if (!MapaEstadoAsiento.verificarAsientoDisponible(coordenadaAsiento)) {
-                System.out.println("Asiento no disponible para este evento/fecha.");
+                System.out.println("Asiento no disponible");
                 continue;
             }
 
@@ -96,9 +101,9 @@ public class GestionReservas {
             BoletaVentas.Ticketdata ticketData = ticketManager.AlamacenaDatosTickets(sc, precioAsiento, coordenadaAsiento, zonaAsiento);
 
             // Guardar información boletas y agregar al listado
-            BoletaVentas.Tickets.add(ticketData);
+            BoletaVentas.agregarTicket(ticketData);
 
-            // Reservar asiento (esto modifica SeatingMap temporalmente)
+
             MapaEstadoAsiento.reservaPendiente[fila][columna] = true;
             System.out.println("¡Reserva confirmada! Asiento " + coordenadaAsiento + " reservado.");
 
@@ -112,12 +117,11 @@ public class GestionReservas {
                 System.out.println("Por favor dirigete a imprimir boletas en menu para confirmar tu compra");
 
 
-
-                //LLamar metodos de la clase MapaAsientosEstados para almacenar la información del usuario para gestionar su boleta y resumen de ventas
-
             }
         }
     }
+
+
 
 
 }

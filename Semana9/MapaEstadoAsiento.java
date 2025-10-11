@@ -1,6 +1,6 @@
 package Formativas_DuocUC.Semana9;
 
-import Formativas_DuocUC.Semana8.SeatingMap;
+
 
 public class MapaEstadoAsiento {
 
@@ -51,7 +51,6 @@ public class MapaEstadoAsiento {
 
 
 
-
         public void marcarAsientoComoOcupado(String coordenadaAsiento) {
             try {
                 char filaChar = coordenadaAsiento.charAt(0);
@@ -71,19 +70,30 @@ public class MapaEstadoAsiento {
 
 
 
-    // Verificar si un asiento está disponible para un evento-fecha
+    // Verificar si un asiento está disponible
     public static boolean verificarAsientoDisponible(String coordenadaAsiento) {
+
 
         try {
             char filaChar = coordenadaAsiento.charAt(0);
             int fila = filaChar - 'A';
             int columna = Integer.parseInt(coordenadaAsiento.substring(1)) - 1;
 
-            if (fila < 0 || fila > 4 || columna < 0 || columna > 5) {
+            if (fila < 0 || fila >= asientos.length + 1 || columna < 0 || columna >=asientos.length+1 ) {
+                System.out.println("Error: Asiento fuera de rango.");
                 return false;
             }
 
-            return asientos[fila][columna] && reservaPendiente[fila][columna];
+            boolean disponible = !asientos[fila][columna] && !reservaPendiente[fila][columna];
+
+            if (disponible) {
+                if(asientos[fila][columna]) {
+                    System.out.println("Asiento " + coordenadaAsiento + " está OCUPADO.");
+                }else if (reservaPendiente[fila][columna]) {
+                    System.out.println("Asiento " + coordenadaAsiento + " está RESERVADO.");
+                }
+            }
+            return disponible;
 
         } catch (Exception e) {
             return false;

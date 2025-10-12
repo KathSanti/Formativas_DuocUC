@@ -70,9 +70,9 @@ public class BoletaVentas {
 
     public BoletaVentas.Ticketdata AlamacenaDatosTickets(Scanner sc,  int precioAsiento, String codigoAsiento, String zonaAsiento) {
         int edad = 0;
-        char sexo = 'a';
+        char sexo = ' ';
         boolean edadValida = false;
-        double descuentoaplicado;
+        double descuentoaplicado = 0;
 
         while (!edadValida) {
             try {
@@ -88,6 +88,7 @@ public class BoletaVentas {
                 edad = sc.nextInt();
                 sc.nextLine();
 
+
                 if (edad <= 0) {
                     System.out.println("Error: La edad no puede ser negativa o cero.");
                 } else if (edad > 120) {
@@ -100,6 +101,12 @@ public class BoletaVentas {
                 sc.nextLine();
             }
         }
+
+
+        sexo = ValidacionesEntradas.validarSexo(sc);
+
+
+
 
         // Calcular descuento
         if (edad >= 60) {
@@ -120,9 +127,6 @@ public class BoletaVentas {
             System.out.println(" ");
         } else {
             descuentoaplicado = 0;
-            System.out.println("Sin descuento aplicado");
-            System.out.println("Por favor ingresa tu sexo (F/M): ");
-            sexo = sc.next().toUpperCase().charAt(0);
             if (sexo == 'M' || sexo == 'm') {
                 descuentoaplicado = 0;
                 System.out.println("Sin descuento aplicado");
@@ -137,7 +141,6 @@ public class BoletaVentas {
         // Solicitar datos del cliente
         System.out.print("Ingrese su RUT (sin puntos ni guión): ");
         int rut = ValidacionesEntradas.validarangorut(sc);
-
 
 
         System.out.print("Ingrese su nombre: ");
@@ -243,9 +246,13 @@ public class BoletaVentas {
         double totalGeneral = 0;
         double totalDescuentosGeneral = 0;
         int asientosTotales = 0;
+        int hombresTotales = 0;
+        int mujeresTotales = 0;
 
         for (VentaGeneral venta : VentaGeneral) {
             System.out.println("Asientos vendidos : " + venta.getCantidadAsientos());
+            System.out.println("Hombres           : " + venta.getCantidadHombres());
+            System.out.println("Mujeres           : " + venta.getCantidadMujeres());
             System.out.println("Descuentos        : $" + venta.totalDescuentos);
             System.out.println("Total             : $" + venta.total);
             System.out.println("--------------------------------");
@@ -253,6 +260,8 @@ public class BoletaVentas {
             totalGeneral += venta.total;
             totalDescuentosGeneral += venta.getTotalDescuentos();
             asientosTotales += venta.getCantidadAsientos();
+            hombresTotales += venta.getCantidadHombres();
+            mujeresTotales += venta.getCantidadMujeres();
         }
 
         System.out.println("============= Total General =================");

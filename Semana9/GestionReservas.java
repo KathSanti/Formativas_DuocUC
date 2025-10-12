@@ -16,6 +16,8 @@ public class GestionReservas {
         public double total;
         public double totalDescuentos;
         public int cantidadAsientos;
+        public int cantidadHombres;
+        public int cantidadMujeres;
 
         public VentaGeneral() {
 
@@ -23,6 +25,8 @@ public class GestionReservas {
             this.total = 0;
             this.totalDescuentos = 0;
             this.cantidadAsientos = 0;
+            this.cantidadHombres = 0;
+            this.cantidadMujeres = 0;
 
         }
 
@@ -32,6 +36,13 @@ public class GestionReservas {
             this.tickets.add(BoletaVentas);
             this.total += BoletaVentas.totalPagar;
             this.totalDescuentos += BoletaVentas.descuento;
+            this.cantidadAsientos++;
+
+            if (BoletaVentas.sexo == 'M' || BoletaVentas.sexo == 'm') {
+                this.cantidadHombres++;
+            } else if (BoletaVentas.sexo == 'F' || BoletaVentas.sexo == 'f') {
+                this.cantidadMujeres++;
+            }
         }
 
         //Metodo rapido para obtener la cantidad de asientos vendidos en la clase ticket
@@ -45,6 +56,9 @@ public class GestionReservas {
         public double getTotalDescuentos() {
             return totalDescuentos;
         }
+
+        public int getCantidadHombres() { return cantidadHombres; }
+        public int getCantidadMujeres() { return cantidadMujeres; }
     }
 
     public static List<GestionReservas.VentaGeneral> VentaGeneral = new ArrayList<>();

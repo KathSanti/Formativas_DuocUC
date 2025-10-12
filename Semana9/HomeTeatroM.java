@@ -52,10 +52,9 @@ public class HomeTeatroM {
                 case 4:
                     BoletaVentas.eliminarReserva();
 
-
                     break;
                 case 5:
-                    salir = bucleopcioncuatro(sc);
+                    salir = bucleOpcioSalir(sc);
                     break;
 
                 default:
@@ -99,7 +98,7 @@ public class HomeTeatroM {
     }
 
 
-    private static boolean bucleopcioncuatro(Scanner sc) {
+    private static boolean bucleOpcioSalir(Scanner sc) {
 
         char salirMenu;
 

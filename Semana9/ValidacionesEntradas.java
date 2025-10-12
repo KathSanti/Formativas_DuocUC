@@ -45,4 +45,24 @@ public class ValidacionesEntradas {
         }
 
     }
+
+    public static char validarSexo(Scanner sc) {
+        char sexo = ' ';
+        boolean sexoValido = false;
+
+
+        do {
+            System.out.print("Por favor ingresa tu sexo (F/M): ");
+            sexo = sc.nextLine().toUpperCase().charAt(0);
+
+
+            if (sexo == 'F' || sexo == 'M') {
+                sexoValido = true;
+            } else {
+                System.out.println("Error: Por favor ingresa 'F' para Femenino o 'M' para Masculino.");
+            }
+        }while (!sexoValido);
+
+        return sexo;
+    }
 }
